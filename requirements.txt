@@ -1,0 +1,7 @@
+# Bogotá Economic Observatory - Dependencies
+requests>=2.31.0
+pandas>=2.1.0
+openpyxl>=3.1.0     # Excel reading
+psycopg2-binary>=2.9.0  # PostgreSQL (Day 2)
+fastapi>=0.104.0    # API layer (Day 4)
+uvicorn>=0.24.0     # ASGI server (Day 4)
