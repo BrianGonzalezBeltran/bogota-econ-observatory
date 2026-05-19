@@ -8,7 +8,20 @@ for locality, sector, time range, and company size filtering.
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+from math import isfinite
 from src.api.database import get_db
+
+
+def safe_round(val, decimals=2):
+    """Round a numeric value, returning None for NaN/Inf/None."""
+    if val is None:
+        return None
+    try:
+        if not isfinite(val):
+            return None
+        return round(val, decimals)
+    except (TypeError, ValueError):
+        return None
 
 app = FastAPI(
     title="Bogotá Economic Observatory",
@@ -400,8 +413,8 @@ def gdp_by_sector(
         return [
             {
                 "sector": r[0],
-                "pib_constante_2015": round(r[1], 2) if r[1] else None,
-                "variacion_anual_avg": round(r[2], 2) if r[2] else None,
+                "pib_constante_2015": safe_round(r[1]),
+                "variacion_anual_avg": safe_round(r[2]),
             }
             for r in cur.fetchall()
         ]
@@ -435,8 +448,8 @@ def gdp_time_series(sector: Optional[str] = None):
         return [
             {
                 "year": r[0], "quarter": r[1],
-                "pib_constante_2015": round(r[2], 2) if r[2] else None,
-                "pib_corriente": round(r[3], 2) if r[3] else None,
+                "pib_constante_2015": safe_round(r[2]),
+                "pib_corriente": safe_round(r[3]),
             }
             for r in cur.fetchall()
         ]
@@ -496,6 +509,6 @@ def summary():
             "gdp": {
                 "year": gdp[0] if gdp else None,
                 "quarter": gdp[1] if gdp else None,
-                "pib_constante_total": round(gdp[2], 2) if gdp and gdp[2] else None,
+                "pib_constante_total": safe_round(gdp[2]) if gdp else None,
             } if gdp else None,
         }
