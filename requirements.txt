@@ -2,6 +2,11 @@
 requests>=2.31.0
 pandas>=2.1.0
 openpyxl>=3.1.0     # Excel reading
-psycopg2-binary>=2.9.0  # PostgreSQL (Day 2)
-fastapi>=0.104.0    # API layer (Day 4)
-uvicorn>=0.24.0     # ASGI server (Day 4)
+psycopg2-binary>=2.9.0  # PostgreSQL
+fastapi>=0.104.0    # API layer
+uvicorn>=0.24.0     # ASGI server
+
+# Phase 2: AI Agent
+langgraph>=0.2.0    # Agent orchestration
+langchain-groq>=0.2.0  # Groq LLM provider (free tier)
+langchain-core>=0.3.0  # Core abstractions

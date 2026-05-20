@@ -512,3 +512,41 @@ def summary():
                 "pib_constante_total": safe_round(gdp[2]) if gdp else None,
             } if gdp else None,
         }
+
+
+# ------------------------------------------------------------------
+# AI Agent (Phase 2)
+# ------------------------------------------------------------------
+
+from pydantic import BaseModel
+
+
+class AgentQuery(BaseModel):
+    question: str
+
+
+@app.post("/agent/ask")
+def agent_ask(query: AgentQuery):
+    """
+    Ask a natural language question about Bogotá's economy.
+    The AI agent will select the right data tools, query the database,
+    and synthesize a human-readable answer.
+
+    Example questions:
+    - "¿Cuántas empresas se crearon en Kennedy en 2024?"
+    - "What's the unemployment rate trend?"
+    - "Top 5 localities by active businesses"
+    """
+    try:
+        from src.agent.graph import ask
+        result = ask(query.question)
+        return result
+    except ImportError as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Agent dependencies not installed: {e}. Run: pip install langchain-groq langgraph",
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Agent error: {str(e)}")
