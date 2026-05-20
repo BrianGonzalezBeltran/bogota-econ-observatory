@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bogotá Economic Observatory</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #1a2332;
+    --accent: #e8913a;
+    --accent-light: #f4c87a;
+    --teal: #2a9d8f;
+    --coral: #e76f51;
+    --blue: #264653;
+    --surface: #0f1720;
+    --surface-light: #1a2535;
+    --border: #2a3545;
+    --text: #e8e4dd;
+    --text-muted: #8a9ab0;
+    --success: #4ade80;
+    --danger: #f87171;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--primary);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--surface), var(--primary));
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px 28px;
+  }
+
+  .header-inner { max-width: 1100px; margin: 0 auto; }
+
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    display: inline;
+  }
+
+  .live-badge {
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(232, 145, 58, 0.1);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .year-filters {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    align-items: center;
+  }
+
+  .year-filters span { font-size: 12px; color: var(--text-muted); }
+
+  .year-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .year-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  .year-btn.active {
+    background: var(--accent);
+    color: var(--primary);
+    border-color: var(--accent);
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 40px 60px;
+  }
+
+  .kpi-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .kpi-card {
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .kpi-card.accent {
+    background: linear-gradient(135deg, rgba(232, 145, 58, 0.13), rgba(232, 145, 58, 0.03));
+    border-color: rgba(232, 145, 58, 0.27);
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .kpi-card.accent .kpi-value { color: var(--accent); }
+
+  .kpi-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .chart-card {
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .chart-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .chart-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .chart-container { position: relative; width: 100%; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  .loading {
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 60px;
+    text-align: center;
+  }
+
+  .error-box {
+    color: var(--danger);
+    font-size: 14px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(248, 113, 113, 0.07);
+    border-radius: 12px;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .header { padding: 20px; }
+    .container { padding: 16px 20px 40px; }
+    .two-col { grid-template-columns: 1fr; }
+    .kpi-card { min-width: 130px; }
+    .header h1 { font-size: 20px; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in {
+    animation: fadeIn 0.4s ease-out forwards;
+    opacity: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>Bogotá Economic Observatory</h1>
+      <span class="live-badge">LIVE</span>
+    </div>
+    <p>Open data analytics — Secretaría Distrital de Desarrollo Económico</p>
+    <div class="year-filters" id="yearFilters">
+      <span>Filter by year:</span>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="main">
+  <div class="loading" id="loadingMsg">Loading data from API...</div>
+</div>
+
+<script>
+const API = "http://localhost:8003/analytics";
+const COLORS = {
+  accent: "#e8913a",
+  accentLight: "#f4c87a",
+  teal: "#2a9d8f",
+  coral: "#e76f51",
+  blue: "#264653",
+  border: "#2a3545",
+  textMuted: "#8a9ab0",
+  text: "#e8e4dd",
+  gridColor: "rgba(42, 53, 69, 0.8)",
+};
+const CHART_PALETTE = ["#e8913a", "#2a9d8f", "#e76f51", "#f4c87a", "#264653", "#8b5cf6", "#ec4899", "#06b6d4"];
+
+Chart.defaults.color = COLORS.textMuted;
+Chart.defaults.borderColor = COLORS.gridColor;
+Chart.defaults.font.family = "'DM Sans', system-ui";
+Chart.defaults.font.size = 11;
+
+let currentYear = null;
+let charts = {};
+
+function fmt(n) {
+  if (n == null) return "—";
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+  return n.toLocaleString();
+}
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+function destroyCharts() {
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+}
+
+function renderKPIs(summary) {
+  const b = summary.business || {};
+  const l = summary.labor || {};
+  return `
+    <div class="kpi-row">
+      <div class="kpi-card accent animate-in" style="animation-delay:0.05s">
+        <div class="kpi-label">Active businesses</div>
+        <div class="kpi-value">${fmt(b.total_vigentes)}</div>
+        <div class="kpi-subtitle">Matrículas vigentes</div>
+      </div>
+      <div class="kpi-card animate-in" style="animation-delay:0.1s">
+        <div class="kpi-label">Created</div>
+        <div class="kpi-value">${fmt(b.total_creadas)}</div>
+        <div class="kpi-subtitle">New registrations</div>
+      </div>
+      <div class="kpi-card animate-in" style="animation-delay:0.15s">
+        <div class="kpi-label">Cancelled</div>
+        <div class="kpi-value">${fmt(b.total_canceladas)}</div>
+        <div class="kpi-subtitle">Matrículas canceladas</div>
+      </div>
+      <div class="kpi-card animate-in" style="animation-delay:0.2s">
+        <div class="kpi-label">Unemployment</div>
+        <div class="kpi-value">${l.tasa_desocupacion ? l.tasa_desocupacion.toFixed(1) + "%" : "—"}</div>
+        <div class="kpi-subtitle">${l.trimester || ""} ${l.year || ""}</div>
+      </div>
+      <div class="kpi-card animate-in" style="animation-delay:0.25s">
+        <div class="kpi-label">Informality</div>
+        <div class="kpi-value">${l.tasa_informalidad ? l.tasa_informalidad.toFixed(1) + "%" : "—"}</div>
+        <div class="kpi-subtitle">DANE methodology</div>
+      </div>
+    </div>`;
+}
+
+function renderLocalityChart(data) {
+  const top = data.slice(0, 12);
+  const canvas = document.getElementById("localityChart");
+  charts.locality = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: top.map(d => d.locality),
+      datasets: [
+        { label: "Active", data: top.map(d => d.empresas_vigentes), backgroundColor: COLORS.accent, borderRadius: 4 },
+        { label: "Created", data: top.map(d => d.empresas_creadas), backgroundColor: COLORS.teal, borderRadius: 4 },
+        { label: "Cancelled", data: top.map(d => d.empresas_canceladas), backgroundColor: COLORS.coral, borderRadius: 4 },
+      ]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "top", labels: { boxWidth: 12, padding: 16 } } },
+      scales: {
+        x: { ticks: { callback: v => fmt(v) }, grid: { color: COLORS.gridColor } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderSizeChart(data) {
+  const filtered = data.filter(d => d.empresas_vigentes > 0);
+  const canvas = document.getElementById("sizeChart");
+  charts.size = new Chart(canvas, {
+    type: "doughnut",
+    data: {
+      labels: filtered.map(d => d.size),
+      datasets: [{
+        data: filtered.map(d => d.empresas_vigentes),
+        backgroundColor: CHART_PALETTE.slice(0, filtered.length),
+        borderColor: "#1a2535",
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "55%",
+      plugins: {
+        legend: { position: "bottom", labels: { boxWidth: 10, padding: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmt(ctx.raw)}` } }
+      }
+    }
+  });
+}
+
+function renderGenderChart(data) {
+  const filtered = data.filter(d => d.gender && d.gender !== "None" && d.gender !== "nan");
+  const canvas = document.getElementById("genderChart");
+  charts.gender = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: filtered.map(d => d.gender),
+      datasets: [
+        { label: "Active", data: filtered.map(d => d.empresas_vigentes), backgroundColor: COLORS.accent, borderRadius: 4 },
+        { label: "Created", data: filtered.map(d => d.empresas_creadas), backgroundColor: COLORS.teal, borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "top", labels: { boxWidth: 12, padding: 16 } } },
+      scales: {
+        y: { ticks: { callback: v => fmt(v) }, grid: { color: COLORS.gridColor } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderLaborChart(data) {
+  const canvas = document.getElementById("laborChart");
+  const labels = data.map(d => `${d.trimester || ""} ${d.year || ""}`);
+  charts.labor = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Employment %", data: data.map(d => d.tasa_ocupacion), borderColor: COLORS.teal, borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        { label: "Unemployment %", data: data.map(d => d.tasa_desocupacion), borderColor: COLORS.coral, borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        { label: "Informality %", data: data.map(d => d.tasa_informalidad), borderColor: COLORS.accentLight, borderWidth: 2, pointRadius: 0, tension: 0.3 },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "top", labels: { boxWidth: 12, padding: 16 } } },
+      scales: {
+        x: { ticks: { maxTicksLimit: 10, font: { size: 10 } }, grid: { color: COLORS.gridColor } },
+        y: { grid: { color: COLORS.gridColor } }
+      }
+    }
+  });
+}
+
+function renderGDPChart(data) {
+  const canvas = document.getElementById("gdpChart");
+  charts.gdp = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: data.map(d => d.sector ? (d.sector.length > 45 ? d.sector.slice(0, 45) + "…" : d.sector) : "—"),
+      datasets: [{
+        label: "GDP (constant 2015)",
+        data: data.map(d => d.pib_constante_2015),
+        backgroundColor: COLORS.blue,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { callback: v => fmt(v) }, grid: { color: COLORS.gridColor } },
+        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+async function loadDashboard(year) {
+  const main = document.getElementById("main");
+  destroyCharts();
+
+  main.innerHTML = '<div class="loading">Loading data from API...</div>';
+
+  try {
+    const yp = year ? `?year=${year}` : "";
+    const [summary, localities, sizes, gender, labor, gdp, timePeriods] = await Promise.all([
+      fetchJSON(`${API}/summary`),
+      fetchJSON(`${API}/business/by-locality${yp}`),
+      fetchJSON(`${API}/business/by-size${yp}`),
+      fetchJSON(`${API}/business/gender${yp}`),
+      fetchJSON(`${API}/labor/overview`),
+      fetchJSON(`${API}/gdp/by-sector?top_n=8`),
+      fetchJSON(`${API}/dimensions/time-periods`),
+    ]);
+
+    // Year filter buttons
+    const years = [...new Set(timePeriods.map(t => t.year))].filter(y => y >= 2020).sort();
+    const filtersEl = document.getElementById("yearFilters");
+    filtersEl.innerHTML = '<span>Filter by year:</span>' + years.map(y =>
+      `<button class="year-btn ${y === currentYear ? 'active' : ''}" onclick="selectYear(${y})">${y}</button>`
+    ).join("");
+
+    // Build HTML
+    main.innerHTML = renderKPIs(summary) + `
+      <div class="chart-card animate-in" style="animation-delay:0.3s">
+        <div class="chart-title">Businesses by locality</div>
+        <div class="chart-subtitle">Top 12 localities by active companies</div>
+        <div class="chart-container" style="height:380px"><canvas id="localityChart"></canvas></div>
+      </div>
+
+      <div class="two-col">
+        <div class="chart-card animate-in" style="animation-delay:0.35s">
+          <div class="chart-title">By company size</div>
+          <div class="chart-subtitle">Distribution of active businesses</div>
+          <div class="chart-container" style="height:280px"><canvas id="sizeChart"></canvas></div>
+        </div>
+        <div class="chart-card animate-in" style="animation-delay:0.4s">
+          <div class="chart-title">By gender of legal representative</div>
+          <div class="chart-subtitle">Active and newly created businesses</div>
+          <div class="chart-container" style="height:280px"><canvas id="genderChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="chart-card animate-in" style="animation-delay:0.45s">
+        <div class="chart-title">Labor market trends</div>
+        <div class="chart-subtitle">Quarterly rates — DANE/GEIH methodology</div>
+        <div class="chart-container" style="height:300px"><canvas id="laborChart"></canvas></div>
+      </div>
+
+      <div class="chart-card animate-in" style="animation-delay:0.5s">
+        <div class="chart-title">GDP by sector</div>
+        <div class="chart-subtitle">Constant 2015 prices (billions COP)</div>
+        <div class="chart-container" style="height:340px"><canvas id="gdpChart"></canvas></div>
+      </div>
+
+      <div class="footer">
+        <p>Bogotá Economic Observatory — Built by
+          <a href="https://github.com/BrianGonzalezBeltran/bogota-econ-observatory" target="_blank">Brian González Beltrán</a>
+        </p>
+        <p style="margin-top:4px">Data: Datos Abiertos Bogotá — SDDE | API: brainit.run</p>
+      </div>
+    `;
+
+    // Render charts
+    renderLocalityChart(localities);
+    renderSizeChart(sizes);
+    renderGenderChart(gender);
+    renderLaborChart(labor);
+    renderGDPChart(gdp);
+
+  } catch (err) {
+    main.innerHTML = `<div class="error-box">
+      Failed to load data: ${err.message}<br><br>
+      Make sure the API is running:<br>
+      <code style="font-family:'DM Mono',monospace;color:var(--accent)">uvicorn src.api.main:app --reload --port 8003</code>
+    </div>`;
+  }
+}
+
+function selectYear(y) {
+  currentYear = y;
+  loadDashboard(y);
+}
+
+loadDashboard(null);
+</script>
+</body>
+</html>
