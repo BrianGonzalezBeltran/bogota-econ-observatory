@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask the Observatory — Bogotá Economic Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c1017;
+    --surface: #141921;
+    --surface-hover: #1a2230;
+    --border: #1e2736;
+    --accent: #e8913a;
+    --accent-glow: rgba(232, 145, 58, 0.08);
+    --teal: #2a9d8f;
+    --text: #d6dae4;
+    --text-dim: #6b7a94;
+    --text-bright: #f0f2f6;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Outfit', sans-serif;
+    --danger: #f87171;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 14px; }
+
+  .header-left h1 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  .header-left .badge {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--teal);
+    background: rgba(42, 157, 143, 0.12);
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .header-right a {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .header-right a:hover { color: var(--accent); }
+
+  /* Chat area */
+  .chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  /* Welcome state */
+  .welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+
+  .welcome.hidden { display: none; }
+
+  .welcome-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .welcome h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+
+  .welcome p {
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    max-width: 420px;
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+    max-width: 540px;
+  }
+
+  .suggestion-btn {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 400;
+  }
+
+  .suggestion-btn:hover {
+    color: var(--text-bright);
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  /* Messages */
+  .message {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeUp 0.3s ease-out;
+  }
+
+  .message-user {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .message-user .bubble {
+    background: rgba(232, 145, 58, 0.12);
+    border: 1px solid rgba(232, 145, 58, 0.2);
+    color: var(--text-bright);
+    border-radius: 16px 16px 4px 16px;
+    padding: 12px 18px;
+    max-width: 80%;
+    font-size: 0.92rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .message-agent {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .message-agent .bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 16px 16px 16px 4px;
+    padding: 16px 20px;
+    font-size: 0.92rem;
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 90%;
+  }
+
+  .message-agent .meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-left: 4px;
+  }
+
+  .meta-tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    background: rgba(107, 122, 148, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .meta-tag.tool {
+    color: var(--teal);
+    background: rgba(42, 157, 143, 0.1);
+  }
+
+  /* Loading dots */
+  .thinking {
+    display: flex;
+    gap: 6px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px 16px 16px 4px;
+    width: fit-content;
+  }
+
+  .thinking span {
+    width: 7px;
+    height: 7px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .thinking span:nth-child(2) { animation-delay: 0.15s; }
+  .thinking span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 16px 28px 24px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .input-wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-field {
+    flex: 1;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    color: var(--text-bright);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    outline: none;
+    resize: none;
+    min-height: 48px;
+    max-height: 120px;
+    line-height: 1.4;
+    font-weight: 400;
+    transition: border-color 0.2s;
+  }
+
+  .input-field::placeholder { color: var(--text-dim); font-weight: 300; }
+  .input-field:focus { border-color: var(--accent); }
+
+  .send-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: #d17e2f; transform: scale(1.04); }
+
+  .send-btn:disabled {
+    background: var(--surface);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .send-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--bg);
+  }
+
+  .send-btn:disabled svg { fill: var(--text-dim); }
+
+  .disclaimer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 10px;
+    font-weight: 300;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Error */
+  .error-bubble {
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    color: var(--danger);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 640px) {
+    .header { padding: 16px 20px; }
+    .chat-container { padding: 16px; }
+    .input-area { padding: 12px 16px 20px; }
+    .message-user .bubble { max-width: 90%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Ask the Observatory</h1>
+    <span class="badge">AI Agent</span>
+  </div>
+  <div class="header-right">
+    <a href="/observatory.html">← Dashboard</a>
+  </div>
+</div>
+
+<div class="chat-container" id="chat">
+  <div class="welcome" id="welcome">
+    <div class="welcome-icon">🏙</div>
+    <h2>Bogotá Economic Intelligence</h2>
+    <p>Ask questions about Bogotá's economy in natural language. The AI agent queries live data from the Secretaría Distrital de Desarrollo Económico.</p>
+    <div class="suggestions">
+      <button class="suggestion-btn" onclick="askSuggestion(this)">¿Cuántas empresas activas hay en Bogotá?</button>
+      <button class="suggestion-btn" onclick="askSuggestion(this)">Top 5 localities by business creation</button>
+      <button class="suggestion-btn" onclick="askSuggestion(this)">¿Cuál es la tasa de desempleo?</button>
+      <button class="suggestion-btn" onclick="askSuggestion(this)">GDP breakdown by sector</button>
+      <button class="suggestion-btn" onclick="askSuggestion(this)">Empresas por género del representante legal</button>
+    </div>
+  </div>
+</div>
+
+<div class="input-area">
+  <div class="input-wrapper">
+    <textarea
+      id="input"
+      class="input-field"
+      placeholder="Ask about Bogotá's economy..."
+      rows="1"
+      onkeydown="handleKey(event)"
+      oninput="autoResize(this)"
+    ></textarea>
+    <button class="send-btn" id="sendBtn" onclick="send()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <div class="disclaimer">
+    Powered by LangGraph + Groq · Data from Datos Abiertos Bogotá · Built by
+    <a href="https://brainit.run" style="color:var(--accent);text-decoration:none">Brian González Beltrán</a>
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:8003/analytics";
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+const welcome = document.getElementById("welcome");
+let busy = false;
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+}
+
+function askSuggestion(btn) {
+  input.value = btn.textContent;
+  send();
+}
+
+function addMessage(role, content, meta) {
+  welcome.classList.add("hidden");
+
+  const div = document.createElement("div");
+  div.className = `message message-${role}`;
+
+  if (role === "user") {
+    div.innerHTML = `<div class="bubble">${escHtml(content)}</div>`;
+  } else if (role === "thinking") {
+    div.innerHTML = `<div class="thinking"><span></span><span></span><span></span></div>`;
+    div.id = "thinking";
+  } else {
+    let metaHtml = "";
+    if (meta && meta.tools_used && meta.tools_used.length) {
+      metaHtml = `<div class="meta">
+        ${meta.tools_used.map(t => `<span class="meta-tag tool">${t}</span>`).join("")}
+        <span class="meta-tag">${meta.steps} steps</span>
+      </div>`;
+    }
+    div.innerHTML = `<div class="bubble">${formatAnswer(content)}</div>${metaHtml}`;
+  }
+
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function removeThinking() {
+  const el = document.getElementById("thinking");
+  if (el) el.remove();
+}
+
+function escHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function formatAnswer(text) {
+  // Basic markdown-like formatting
+  let html = escHtml(text);
+  // Bold
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  // Line breaks
+  html = html.replace(/\n/g, "<br>");
+  return html;
+}
+
+async function send() {
+  const q = input.value.trim();
+  if (!q || busy) return;
+
+  busy = true;
+  sendBtn.disabled = true;
+  input.value = "";
+  input.style.height = "auto";
+
+  addMessage("user", q);
+  addMessage("thinking");
+
+  try {
+    const resp = await fetch(`${API}/agent/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q }),
+    });
+
+    removeThinking();
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: "Unknown error" }));
+      addMessage("agent", err.detail || `Error ${resp.status}`, null);
+      return;
+    }
+
+    const data = await resp.json();
+    addMessage("agent", data.answer, { tools_used: data.tools_used, steps: data.steps });
+
+  } catch (err) {
+    removeThinking();
+    const div = document.createElement("div");
+    div.className = "message message-agent";
+    div.innerHTML = `<div class="bubble error-bubble">Connection failed — is the API running?</div>`;
+    chat.appendChild(div);
+  } finally {
+    busy = false;
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+</script>
+</body>
+</html>
