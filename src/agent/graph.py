@@ -46,34 +46,54 @@ def create_observatory_agent():
     return agent
 
 
-def ask(question: str) -> dict:
+def ask(question: str, max_retries: int = 3) -> dict:
     """
     Ask a question to the Observatory agent.
 
     Args:
         question: Natural language question in Spanish or English.
+        max_retries: Maximum retry attempts on rate limit errors.
 
     Returns:
         dict with 'answer' (str), 'tools_used' (list), and 'steps' (int).
     """
+    import time
+
     agent = create_observatory_agent()
 
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": question}]}
-    )
+    for attempt in range(max_retries):
+        try:
+            result = agent.invoke(
+                {"messages": [{"role": "user", "content": question}]},
+                config={"recursion_limit": 10},
+            )
 
-    # Extract the final answer and tool usage info
-    messages = result["messages"]
-    final_message = messages[-1]
+            messages = result["messages"]
+            final_message = messages[-1]
 
-    tools_used = []
-    for msg in messages:
-        if hasattr(msg, "tool_calls") and msg.tool_calls:
-            for tc in msg.tool_calls:
-                tools_used.append(tc["name"])
+            tools_used = []
+            for msg in messages:
+                if hasattr(msg, "tool_calls") and msg.tool_calls:
+                    for tc in msg.tool_calls:
+                        tools_used.append(tc["name"])
+
+            return {
+                "answer": final_message.content,
+                "tools_used": tools_used,
+                "steps": len(messages),
+            }
+
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str or "rate_limit" in error_str:
+                if attempt < max_retries - 1:
+                    wait = (attempt + 1) * 5
+                    time.sleep(wait)
+                    continue
+            raise
 
     return {
-        "answer": final_message.content,
-        "tools_used": tools_used,
-        "steps": len(messages),
+        "answer": "The service is temporarily busy. Please try again in a moment.",
+        "tools_used": [],
+        "steps": 0,
     }

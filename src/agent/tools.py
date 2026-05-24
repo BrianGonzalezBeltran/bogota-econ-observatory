@@ -125,12 +125,19 @@ def get_business_by_gender(
 
 
 @tool
-def get_labor_overview() -> list:
+def get_labor_overview(latest_only: bool = False) -> list:
     """Get the full labor market time series for Bogotá: employment rate, unemployment rate,
     informality rate, and absolute numbers (ocupados, desocupados, informales).
     Data is quarterly from 2021 to 2025.
-    Use this when the user asks about employment, unemployment, jobs, or labor market conditions."""
-    return _get("/labor/overview")
+    Use this when the user asks about employment, unemployment, jobs, or labor market conditions.
+
+    Args:
+        latest_only: If True, return only the most recent quarter. Default False returns all quarters.
+    """
+    data = _get("/labor/overview")
+    if latest_only and data:
+        return [data[-1]]
+    return data
 
 
 @tool
@@ -171,9 +178,13 @@ def get_gdp_time_series(sector: Optional[str] = None) -> list:
 
 
 @tool
-def get_localities() -> list:
+def get_localities(include_codes: bool = True) -> list:
     """Get the list of all 20 localities (neighborhoods) in Bogotá with their codes.
-    Use this when you need to verify a locality name or list available localities."""
+    Use this when you need to verify a locality name or list available localities.
+
+    Args:
+        include_codes: Whether to include locality codes in the response. Default True.
+    """
     return _get("/dimensions/localities")
 
 
