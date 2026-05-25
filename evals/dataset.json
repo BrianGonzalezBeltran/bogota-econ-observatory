@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1,
+    "question": "¿Cuál es la localidad con el mayor número de empresas?",
+    "expected_tool": "get_business_by_locality",
+    "expected_contains": "Suba",
+    "category": "business",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 2,
+    "question": "¿En cuál localidad se ve mayor disparidad entre hombres y mujeres propietarios?",
+    "expected_tool": "get_business_by_gender",
+    "expected_contains": "Masculino",
+    "category": "business",
+    "difficulty": "hard",
+    "language": "es"
+  },
+  {
+    "id": 3,
+    "question": "¿En cuál localidad hay una mayor proporción de empresas micro?",
+    "expected_tool": "get_business_by_size",
+    "expected_contains": "Microempresa",
+    "category": "business",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 4,
+    "question": "¿Cómo varió el desempleo entre 2022 y 2025?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "%",
+    "category": "labor",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 5,
+    "question": "¿Cuál ha sido el año con mayor informalidad promedio?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "informalidad",
+    "category": "labor",
+    "difficulty": "hard",
+    "language": "es"
+  },
+  {
+    "id": 6,
+    "question": "¿Cuál es el sector con mayor PIB?",
+    "expected_tool": "get_gdp_by_sector",
+    "expected_contains": null,
+    "category": "gdp",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 7,
+    "question": "¿Cuál fue el PIB de Actividades financieras y de seguros?",
+    "expected_tool": "get_gdp_by_sector",
+    "expected_contains": "financier",
+    "category": "gdp",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 8,
+    "question": "What is the trend in active businesses over time?",
+    "expected_tool": "get_business_time_series",
+    "expected_contains": null,
+    "category": "business",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": 9,
+    "question": "¿Cuál fue la tasa de desempleo registrada para 2025?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "%",
+    "category": "labor",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 10,
+    "question": "¿Cuál fue el sector con menor PIB?",
+    "expected_tool": "get_gdp_by_sector",
+    "expected_contains": null,
+    "category": "gdp",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 11,
+    "question": "¿Cuántas empresas activas hay en Bogotá?",
+    "expected_tool": "get_summary",
+    "expected_contains": "850",
+    "category": "business",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 12,
+    "question": "How many businesses were created in Kennedy?",
+    "expected_tool": "get_business_by_locality",
+    "expected_contains": "Kennedy",
+    "category": "business",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": 13,
+    "question": "¿Cuántas empresas se cancelaron en Chapinero?",
+    "expected_tool": "get_business_by_locality",
+    "expected_contains": "Chapinero",
+    "category": "business",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 14,
+    "question": "What is the current unemployment rate?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "%",
+    "category": "labor",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": 15,
+    "question": "¿Cuántas empresas grandes hay en Bogotá?",
+    "expected_tool": "get_business_by_size",
+    "expected_contains": "Grande",
+    "category": "business",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 16,
+    "question": "Top 3 localidades por empresas creadas en 2024",
+    "expected_tool": "get_business_by_locality",
+    "expected_contains": null,
+    "category": "business",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 17,
+    "question": "What percentage of businesses are run by women?",
+    "expected_tool": "get_business_by_gender",
+    "expected_contains": "Femenino",
+    "category": "business",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": 18,
+    "question": "¿Cuál es la tasa de informalidad más reciente?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "%",
+    "category": "labor",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 19,
+    "question": "¿Qué porcentaje de la fuerza laboral son asalariados?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "%",
+    "category": "labor",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 20,
+    "question": "What are the top 5 GDP sectors?",
+    "expected_tool": "get_gdp_by_sector",
+    "expected_contains": null,
+    "category": "gdp",
+    "difficulty": "easy",
+    "language": "en"
+  },
+  {
+    "id": 21,
+    "question": "¿Cuántas SAS hay registradas?",
+    "expected_tool": "get_business_by_sector",
+    "expected_contains": null,
+    "category": "business",
+    "difficulty": "hard",
+    "language": "es"
+  },
+  {
+    "id": 22,
+    "question": "¿En qué localidades se crean más microempresas?",
+    "expected_tool": "get_business_by_locality",
+    "expected_contains": null,
+    "category": "business",
+    "difficulty": "hard",
+    "language": "es"
+  },
+  {
+    "id": 23,
+    "question": "How has GDP evolved in the last 5 years?",
+    "expected_tool": "get_gdp_time_series",
+    "expected_contains": null,
+    "category": "gdp",
+    "difficulty": "medium",
+    "language": "en"
+  },
+  {
+    "id": 24,
+    "question": "¿Cuál es el resumen general de la economía de Bogotá?",
+    "expected_tool": "get_summary",
+    "expected_contains": null,
+    "category": "overview",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 25,
+    "question": "¿Cuántas localidades tiene Bogotá?",
+    "expected_tool": "get_localities",
+    "expected_contains": "20",
+    "category": "reference",
+    "difficulty": "easy",
+    "language": "es"
+  },
+  {
+    "id": 26,
+    "question": "¿Cuántas empresas se crearon vs se cancelaron en Usaquén?",
+    "expected_tool": "get_business_by_locality",
+    "expected_contains": "Usaquén",
+    "category": "business",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 27,
+    "question": "What is the informality rate and how does it compare to unemployment?",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": "%",
+    "category": "labor",
+    "difficulty": "hard",
+    "language": "en"
+  },
+  {
+    "id": 28,
+    "question": "¿Qué sector económico tiene más empresas: servicios o comercio?",
+    "expected_tool": "get_business_by_sector",
+    "expected_contains": null,
+    "category": "business",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 29,
+    "question": "Dame un panorama completo del mercado laboral",
+    "expected_tool": "get_labor_overview",
+    "expected_contains": null,
+    "category": "labor",
+    "difficulty": "medium",
+    "language": "es"
+  },
+  {
+    "id": 30,
+    "question": "How many businesses were cancelled across all of Bogotá?",
+    "expected_tool": "get_summary",
+    "expected_contains": "52",
+    "category": "business",
+    "difficulty": "easy",
+    "language": "en"
+  }
+]

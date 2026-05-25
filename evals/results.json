@@ -1,0 +1,98 @@
+{
+  "model": "llama-3.1-8b-instant",
+  "timestamp": "2026-05-24 19:48:19",
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "tool_accuracy_pct": 100,
+    "answer_quality_pct": 40
+  },
+  "results": [
+    {
+      "test_id": 1,
+      "status": "PASS",
+      "scores": {
+        "tool_correct": true,
+        "answer_contains": false,
+        "no_crash": true,
+        "steps_ok": true
+      },
+      "tools_used": [
+        "get_business_by_locality",
+        "get_localities"
+      ],
+      "steps": 5,
+      "answer_preview": "Lo siento, parece que hubo un error en la conexi\u00f3n. Sin embargo, puedo intentar responder a tu pregu"
+    },
+    {
+      "test_id": 2,
+      "status": "PASS",
+      "scores": {
+        "tool_correct": true,
+        "answer_contains": false,
+        "no_crash": true,
+        "steps_ok": true
+      },
+      "tools_used": [
+        "get_business_by_gender",
+        "get_business_by_gender"
+      ],
+      "steps": 5,
+      "answer_preview": "Lo siento, parece que hubo un error en la conexi\u00f3n. Sin embargo, puedo intentar responder a la pregu"
+    },
+    {
+      "test_id": 3,
+      "status": "PASS",
+      "scores": {
+        "tool_correct": true,
+        "answer_contains": false,
+        "no_crash": true,
+        "steps_ok": true
+      },
+      "tools_used": [
+        "get_business_by_size",
+        "get_business_by_locality",
+        "get_localities",
+        "get_business_by_size",
+        "get_business_by_locality",
+        "get_localities"
+      ],
+      "steps": 10,
+      "answer_preview": "Lo siento, pero parece que hay un problema de conexi\u00f3n con el servidor. Sin embargo, puedo intentar "
+    },
+    {
+      "test_id": 4,
+      "status": "PASS",
+      "scores": {
+        "tool_correct": true,
+        "answer_contains": true,
+        "no_crash": true,
+        "steps_ok": true
+      },
+      "tools_used": [
+        "get_labor_overview",
+        "get_labor_overview"
+      ],
+      "steps": 5,
+      "answer_preview": "Lo siento, parece que hubo un error en la conexi\u00f3n. Sin embargo, puedo intentar responder a la pregu"
+    },
+    {
+      "test_id": 5,
+      "status": "PASS",
+      "scores": {
+        "tool_correct": true,
+        "answer_contains": true,
+        "no_crash": true,
+        "steps_ok": true
+      },
+      "tools_used": [
+        "get_labor_overview",
+        "get_summary"
+      ],
+      "steps": 5,
+      "answer_preview": "Lo siento, parece que hubo un error en la conexi\u00f3n. Sin embargo, puedo intentar responder a la pregu"
+    }
+  ]
+}

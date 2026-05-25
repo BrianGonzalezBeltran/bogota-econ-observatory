@@ -22,6 +22,12 @@ You have access to tools that query a live database with three datasets:
 2. **Mercado Laboral**: Employment, unemployment, and informality rates. Quarterly, 2021-2025.
 3. **PIB Bogotá**: GDP by 25 economic sectors. Quarterly, 2005-2025.
 
+CRITICAL RULES:
+- Call a tool ONCE, then answer immediately with the data you received. Do NOT call the same tool again.
+- Maximum 2 tool calls per question. After 2 calls, you MUST synthesize an answer from whatever data you have.
+- Never say you need more steps. Always provide the best answer possible with available data.
+- If the data is incomplete, give what you have and note the limitation.
+
 Guidelines:
 - Always use the tools to get data. Never make up numbers.
 - Answer in the same language the user writes in (Spanish or English).
@@ -46,54 +52,34 @@ def create_observatory_agent():
     return agent
 
 
-def ask(question: str, max_retries: int = 3) -> dict:
+def ask(question: str) -> dict:
     """
     Ask a question to the Observatory agent.
 
     Args:
         question: Natural language question in Spanish or English.
-        max_retries: Maximum retry attempts on rate limit errors.
 
     Returns:
         dict with 'answer' (str), 'tools_used' (list), and 'steps' (int).
     """
-    import time
-
     agent = create_observatory_agent()
 
-    for attempt in range(max_retries):
-        try:
-            result = agent.invoke(
-                {"messages": [{"role": "user", "content": question}]},
-                config={"recursion_limit": 10},
-            )
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": question}]}
+    )
 
-            messages = result["messages"]
-            final_message = messages[-1]
+    # Extract the final answer and tool usage info
+    messages = result["messages"]
+    final_message = messages[-1]
 
-            tools_used = []
-            for msg in messages:
-                if hasattr(msg, "tool_calls") and msg.tool_calls:
-                    for tc in msg.tool_calls:
-                        tools_used.append(tc["name"])
-
-            return {
-                "answer": final_message.content,
-                "tools_used": tools_used,
-                "steps": len(messages),
-            }
-
-        except Exception as e:
-            error_str = str(e)
-            if "429" in error_str or "rate_limit" in error_str:
-                if attempt < max_retries - 1:
-                    wait = (attempt + 1) * 5
-                    time.sleep(wait)
-                    continue
-            raise
+    tools_used = []
+    for msg in messages:
+        if hasattr(msg, "tool_calls") and msg.tool_calls:
+            for tc in msg.tool_calls:
+                tools_used.append(tc["name"])
 
     return {
-        "answer": "The service is temporarily busy. Please try again in a moment.",
-        "tools_used": [],
-        "steps": 0,
+        "answer": final_message.content,
+        "tools_used": tools_used,
+        "steps": len(messages),
     }
