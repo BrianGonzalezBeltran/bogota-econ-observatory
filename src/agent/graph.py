@@ -9,10 +9,15 @@ executes it, observes the result, and either calls another tool
 or generates the final answer.
 """
 
+import time
+import logging
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import SystemMessage
 from src.agent.tools import ALL_TOOLS
 from src.agent.llm import get_llm
+from src.agent.observability import get_langfuse_handler
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are an analytical assistant for the Bogotá Economic Observatory.
 You answer questions about Bogotá's economy using real data from the Secretaría Distrital de Desarrollo Económico (SDDE).
@@ -60,13 +65,24 @@ def ask(question: str) -> dict:
         question: Natural language question in Spanish or English.
 
     Returns:
-        dict with 'answer' (str), 'tools_used' (list), and 'steps' (int).
+        dict with 'answer', 'tools_used', 'steps', 'latency_ms', and 'trace_url'.
     """
     agent = create_observatory_agent()
 
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": question}]}
+    # Initialize Langfuse tracing
+    langfuse_handler = get_langfuse_handler(
+        tags=["observatory", "agent"],
+        metadata={"question_language": "auto"},
     )
+
+    start = time.perf_counter()
+
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": question}]},
+        config={"callbacks": [langfuse_handler]},
+    )
+
+    latency_ms = round((time.perf_counter() - start) * 1000)
 
     # Extract the final answer and tool usage info
     messages = result["messages"]
@@ -78,8 +94,25 @@ def ask(question: str) -> dict:
             for tc in msg.tool_calls:
                 tools_used.append(tc["name"])
 
+    # Build trace URL for debugging
+    trace_id = langfuse_handler.last_trace_id
+    trace_url = f"https://us.cloud.langfuse.com/trace/{trace_id}" if trace_id else None
+
+    logger.info(
+        "agent_query",
+        extra={
+            "question": question[:200],
+            "tools_used": tools_used,
+            "steps": len(messages),
+            "latency_ms": latency_ms,
+            "trace_url": trace_url,
+        },
+    )
+
     return {
         "answer": final_message.content,
         "tools_used": tools_used,
         "steps": len(messages),
+        "latency_ms": latency_ms,
+        "trace_url": trace_url,
     }
