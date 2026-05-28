@@ -6,7 +6,8 @@
     "expected_contains": "Suba",
     "category": "business",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "Suba es la localidad con más empresas vigentes en Bogotá, con 55,269 empresas en 2024."
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "expected_contains": "Masculino",
     "category": "business",
     "difficulty": "hard",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 3,
@@ -24,7 +26,8 @@
     "expected_contains": "Microempresa",
     "category": "business",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 4,
@@ -33,7 +36,8 @@
     "expected_contains": "%",
     "category": "labor",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "El desempleo en Bogotá bajó del 14.6% en el primer trimestre de 2022 al 6.5% en el cuarto trimestre de 2025, mostrando una tendencia descendente sostenida."
   },
   {
     "id": 5,
@@ -42,7 +46,8 @@
     "expected_contains": "informalidad",
     "category": "labor",
     "difficulty": "hard",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 6,
@@ -51,7 +56,8 @@
     "expected_contains": null,
     "category": "gdp",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 7,
@@ -60,7 +66,8 @@
     "expected_contains": "financier",
     "category": "gdp",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 8,
@@ -69,7 +76,8 @@
     "expected_contains": null,
     "category": "business",
     "difficulty": "medium",
-    "language": "en"
+    "language": "en",
+    "reference_answer": "Based on 2 available data points, active businesses grew from 400,076 in September 2023 to 450,373 in March 2024, an increase of about 12.6%."
   },
   {
     "id": 9,
@@ -78,7 +86,8 @@
     "expected_contains": "%",
     "category": "labor",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "La tasa de desempleo en Bogotá para 2025 fue de 6.5% en el cuarto trimestre."
   },
   {
     "id": 10,
@@ -87,7 +96,8 @@
     "expected_contains": null,
     "category": "gdp",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 11,
@@ -96,7 +106,8 @@
     "expected_contains": "850",
     "category": "business",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "Hay 850,449 empresas activas en Bogotá."
   },
   {
     "id": 12,
@@ -105,7 +116,8 @@
     "expected_contains": "Kennedy",
     "category": "business",
     "difficulty": "easy",
-    "language": "en"
+    "language": "en",
+    "reference_answer": null
   },
   {
     "id": 13,
@@ -114,7 +126,8 @@
     "expected_contains": "Chapinero",
     "category": "business",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 14,
@@ -123,7 +136,8 @@
     "expected_contains": "%",
     "category": "labor",
     "difficulty": "easy",
-    "language": "en"
+    "language": "en",
+    "reference_answer": "The current unemployment rate in Bogotá is approximately 8.8%."
   },
   {
     "id": 15,
@@ -132,7 +146,8 @@
     "expected_contains": "Grande",
     "category": "business",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 16,
@@ -141,7 +156,8 @@
     "expected_contains": null,
     "category": "business",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "Las 3 localidades con más empresas creadas en 2024 son Suba, Kennedy y Usaquén."
   },
   {
     "id": 17,
@@ -150,7 +166,8 @@
     "expected_contains": "Femenino",
     "category": "business",
     "difficulty": "medium",
-    "language": "en"
+    "language": "en",
+    "reference_answer": null
   },
   {
     "id": 18,
@@ -159,7 +176,8 @@
     "expected_contains": "%",
     "category": "labor",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "La tasa de informalidad más reciente en Bogotá es de 33.6%."
   },
   {
     "id": 19,
@@ -168,7 +186,8 @@
     "expected_contains": "%",
     "category": "labor",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 20,
@@ -177,7 +196,8 @@
     "expected_contains": null,
     "category": "gdp",
     "difficulty": "easy",
-    "language": "en"
+    "language": "en",
+    "reference_answer": null
   },
   {
     "id": 21,
@@ -186,7 +206,8 @@
     "expected_contains": null,
     "category": "business",
     "difficulty": "hard",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 22,
@@ -195,7 +216,8 @@
     "expected_contains": null,
     "category": "business",
     "difficulty": "hard",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 23,
@@ -204,7 +226,8 @@
     "expected_contains": null,
     "category": "gdp",
     "difficulty": "medium",
-    "language": "en"
+    "language": "en",
+    "reference_answer": null
   },
   {
     "id": 24,
@@ -213,7 +236,8 @@
     "expected_contains": null,
     "category": "overview",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "Bogotá tiene 850,449 empresas activas, 77,205 creadas y 52,597 canceladas. La tasa de desempleo es 7.5% y la tasa de informalidad es 33.6%."
   },
   {
     "id": 25,
@@ -222,7 +246,8 @@
     "expected_contains": "20",
     "category": "reference",
     "difficulty": "easy",
-    "language": "es"
+    "language": "es",
+    "reference_answer": "Bogotá tiene 20 localidades."
   },
   {
     "id": 26,
@@ -231,7 +256,8 @@
     "expected_contains": "Usaquén",
     "category": "business",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 27,
@@ -240,7 +266,8 @@
     "expected_contains": "%",
     "category": "labor",
     "difficulty": "hard",
-    "language": "en"
+    "language": "en",
+    "reference_answer": "The informality rate is 33.6% and the unemployment rate is approximately 8.8%. Informality is significantly higher than unemployment, meaning a large share of employed workers are in informal jobs."
   },
   {
     "id": 28,
@@ -249,7 +276,8 @@
     "expected_contains": null,
     "category": "business",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 29,
@@ -258,7 +286,8 @@
     "expected_contains": null,
     "category": "labor",
     "difficulty": "medium",
-    "language": "es"
+    "language": "es",
+    "reference_answer": null
   },
   {
     "id": 30,
@@ -267,6 +296,7 @@
     "expected_contains": "52",
     "category": "business",
     "difficulty": "easy",
-    "language": "en"
+    "language": "en",
+    "reference_answer": "52,597 businesses were cancelled across all of Bogotá."
   }
 ]
