@@ -95,7 +95,7 @@ def push_scores_to_langfuse(trace_id: str, judge_scores: dict, deterministic_sco
         for name in ["factual_accuracy", "language_match", "completeness", "data_grounding"]:
             value = judge_scores.get(name)
             if value is not None:
-                lf.score(
+                lf.create_score(
                     trace_id=trace_id,
                     name=name,
                     value=float(value),
@@ -106,7 +106,7 @@ def push_scores_to_langfuse(trace_id: str, judge_scores: dict, deterministic_sco
         for name in ["tool_correct", "no_crash", "steps_ok"]:
             value = deterministic_scores.get(name)
             if value is not None:
-                lf.score(
+                lf.create_score(
                     trace_id=trace_id,
                     name=name,
                     value=1.0 if value else 0.0,
