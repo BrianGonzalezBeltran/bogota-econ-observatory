@@ -1,6 +1,6 @@
 # Bogotá Economic Observatory
 
-An end-to-end data + AI system that ingests open economic data from Bogotá, models it into a star schema, serves analytical endpoints, visualizes it in an interactive dashboard, and answers natural language questions through an AI agent.
+An end-to-end data + AI system that ingests open economic data from Bogotá, models it into a star schema, serves analytical endpoints, visualizes it in an interactive dashboard, and answers natural language questions through an AI agent — with full observability and an LLM-as-judge evaluation pipeline.
 
 **Live demo:** [Dashboard](https://brainit.run/observatory.html) · [AI Agent Chat](https://brainit.run/agent.html) · [API Docs](https://api.brainit.run/analytics/docs)
 
@@ -41,7 +41,14 @@ An end-to-end data + AI system that ingests open economic data from Bogotá, mod
 │  Chart.js · 6 charts     │   │  LangGraph ReAct · 10 tools         │
 │  Year filter · KPI cards │   │  Groq (Llama 3.3 70B)               │
 │  brainit.run/observatory │   │  brainit.run/agent                   │
-└──────────────────────────┘   └──────────────────────────────────────┘
+└──────────────────────────┘   └──────────────┬───────────────────────┘
+                                              │
+                                              ▼
+                               ┌──────────────────────────────────────┐
+                               │         OBSERVABILITY                │
+                               │  Langfuse (cloud) · full tracing     │
+                               │  LLM-as-judge eval suite (30 cases)  │
+                               └──────────────────────────────────────┘
 ```
 
 ## What it does
@@ -54,6 +61,10 @@ An end-to-end data + AI system that ingests open economic data from Bogotá, mod
 
 **AI agent:** A LangGraph agent that accepts natural language questions in Spanish or English. The agent uses the ReAct pattern: an LLM (Llama 3.3 70B via Groq) reasons about which of 10 available tools to call, LangGraph executes the tool (which queries the API internally), and the LLM synthesizes a human-readable answer from the JSON results.
 
+**Observability:** Every agent query is traced end-to-end via Langfuse, capturing LLM calls (prompt, completion, tokens, latency), tool executions (parameters, results, duration), and errors. Each API response includes a `trace_url` for direct debugging.
+
+**Evaluation suite:** 30 test cases scored by both deterministic checks (tool selection, crash detection) and an LLM-as-judge (factual accuracy, language match, completeness, data grounding). Results: 93% tool accuracy, 5.0/5 language match, 4.3/5 overall quality.
+
 ## AI agent flow
 
 ```
@@ -64,7 +75,7 @@ agent.html → POST /analytics/agent/ask
   │
   ▼
 LangGraph sends question + 10 tool definitions to Groq
-  │
+  │  (traced via Langfuse callback)
   ▼
 Llama 3.3 70B decides: call get_business_by_locality(locality="Suba")
   │
@@ -75,7 +86,16 @@ Tool executes HTTP GET → FastAPI → PostgreSQL → JSON result
 LangGraph sends history + JSON back to Groq
   │
   ▼
-Llama 3.3 synthesizes: "Hay 104,330 empresas activas en Suba"
+Llama 3.3 synthesizes answer
+  │
+  ▼
+Response: {
+  "answer": "Hay 104,330 empresas activas en Suba",
+  "tools_used": ["get_business_by_locality"],
+  "steps": 4,
+  "latency_ms": 1755,
+  "trace_url": "https://us.cloud.langfuse.com/trace/..."
+}
 ```
 
 ## Data sources
@@ -92,6 +112,45 @@ Llama 3.3 synthesizes: "Hay 104,330 empresas activas en Suba"
 
 **PIB Bogotá** provides GDP at current and constant (2015) prices across 25 economic sectors. Quarterly, 2005–2025.
 
+## Observability
+
+Integrated via Langfuse (cloud, SDK v4.7.0) with a `CallbackHandler` injected into the LangGraph agent. Every query generates a trace with:
+
+- Full agent execution timeline
+- Each LLM call: prompt, completion, input/output tokens, latency
+- Each tool call: name, parameters, result, duration
+- Error traces (e.g., malformed tool calls from Llama 3.3)
+
+The `/agent/ask` response includes `latency_ms` and `trace_url` for per-query debugging.
+
+## Evaluation suite
+
+30 test cases across 5 categories and 3 difficulty levels, evaluated within Groq free tier constraints (100K tokens/day).
+
+**Two scoring layers:**
+- **Deterministic:** tool selection, string matching, crash detection, step count
+- **LLM-as-judge** (Groq Llama 3.1 8B): scores each response 1–5 on factual accuracy, language match, completeness, and data grounding
+
+**Results (29/30 evaluated):**
+
+| Category | Cases | Tool Accuracy | Factual Acc. | Language | Overall |
+|---|---|---|---|---|---|
+| Business | 15 | 87% | 3.7 | 5.0 | 4.5 |
+| Labor | 8 | 100% | 3.2 | 5.0 | 4.3 |
+| GDP | 5 | 100% | 3.0 | 5.0 | 3.6 |
+| Overview | 1 | 100% | 5.0 | 5.0 | 5.0 |
+| **Total** | **29** | **93%** | **3.4** | **5.0** | **4.3** |
+
+Key finding: tool selection and language matching are strong; factual accuracy (3.4/5) is the main gap, caused by Llama 3.3 synthesis limitations (contradictory numbers, incorrect trend directions). See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for details.
+
+```bash
+# Run by category (recommended for free tier)
+python3 -m evals.run_evals --category business --delay 20
+
+# Dry run
+python3 -m evals.run_evals --dry-run
+```
+
 ## Stack
 
 | Layer | Technology |
@@ -102,6 +161,8 @@ Llama 3.3 synthesizes: "Hay 104,330 empresas activas en Suba"
 | Dashboard | HTML, Chart.js |
 | AI Agent | LangGraph, langchain-core, langchain-groq |
 | LLM | Llama 3.3 70B (Groq cloud, free tier) |
+| Observability | Langfuse (cloud, SDK v4.7.0) |
+| Evaluation | LLM-as-judge (Groq Llama 3.1 8B), 30 test cases |
 | Infrastructure | Docker, nginx, systemd, Oracle Cloud ARM |
 | DNS/TLS | Let's Encrypt, certbot |
 
@@ -124,11 +185,20 @@ src/
     graph.py                    # LangGraph ReAct agent
     tools.py                    # 10 tools mapped to API endpoints
     llm.py                      # LLM config (Groq, model-agnostic)
+    observability.py            # Langfuse tracing configuration
     test_agent.py               # CLI test script
+evals/
+  dataset.json                  # 30 test cases with reference answers
+  judge.py                      # LLM-as-judge scoring module
+  run_evals.py                  # Eval runner (HTTP-based, Langfuse integration)
 sql/
   init.sql                      # DDL: star schema (5 dims, 3 facts)
+scripts/
+  refresh.sh                    # Monthly cron: re-ingest + reload
 dashboard.html                  # Interactive frontend
 docker-compose.yml              # PostgreSQL container
+ARCHITECTURE.md                 # Detailed technical architecture
+KNOWN_ISSUES.md                 # Tracked bugs and limitations
 ```
 
 ## API endpoints
@@ -178,6 +248,9 @@ uvicorn src.api.main:app --reload --port 8003
 # (Optional) Test AI agent — requires GROQ_API_KEY
 export GROQ_API_KEY=your_key_here
 python -m src.agent.test_agent "¿Cuántas empresas activas hay en Bogotá?"
+
+# (Optional) Run evaluations
+python3 -m evals.run_evals --category business --delay 20
 ```
 
 ## Infrastructure
@@ -189,10 +262,11 @@ Internet → nginx (443/HTTPS)
               ├── brainit.run/observatory.html  → static dashboard
               ├── brainit.run/agent.html        → AI agent chat
               └── api.brainit.run/analytics/    → FastAPI (systemd, port 8003)
-                    └── PostgreSQL (Docker, port 5432)
+                    ├── PostgreSQL (Docker, port 5432)
+                    └── Langfuse (cloud) ← tracing callbacks
 ```
 
-All services auto-restart on reboot (Docker restart policies + systemd).
+All services auto-restart on reboot (Docker restart policies + systemd). Monthly data refresh via cron (1st of each month, 6:00 AM).
 
 ## Author
 
