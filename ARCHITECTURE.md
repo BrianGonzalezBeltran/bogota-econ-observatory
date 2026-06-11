@@ -240,16 +240,61 @@ Oracle Cloud Free Tier — ARM/Ampere Altra, 4 OCPUs, 24GB RAM, ~200GB storage, 
 
 ## Evaluation Suite
 
-30 test cases across 5 categories (business, labor, GDP, overview, reference) and 3 difficulty levels, supporting both English and Spanish queries.
+30 test cases across 5 categories (business, labor, GDP, overview, reference) and 3 difficulty levels, supporting both English and Spanish queries. Evaluated within Groq free tier constraints (100K tokens/day), requiring category-by-category execution across multiple days.
 
-### Scoring dimensions
+### Scoring: Two Layers
 
+**Layer 1 — Deterministic scoring** (automated, per query):
 - `tool_correct`: did the agent select the right tool?
 - `answer_contains`: does the answer include expected data points?
 - `no_crash`: did the query complete without errors?
 - `steps_ok`: did the agent stay within step limits?
 
-Results saved to `evals/results.json`. Current performance: tool accuracy 100%, answer quality ~40% (synthesis limitations, actively being improved via prompt engineering).
+**Layer 2 — LLM-as-judge** (`evals/judge.py`, Groq Llama 3.1 8B):
+Each response is scored 1-5 on four dimensions by a separate LLM call:
+- `factual_accuracy`: are numbers and claims correct and internally consistent?
+- `language_match`: did the agent respond in the question's language?
+- `completeness`: does the answer address all parts of the question?
+- `data_grounding`: does the answer cite specific data points?
+
+12 of 30 test cases include a `reference_answer` for the judge to compare against.
+
+### Results (29/30 evaluated, 1 failed due to Llama 3.3 tool call bug)
+
+| Category | Cases | Tool Accuracy | Factual Acc. | Language | Completeness | Grounding | Overall |
+|---|---|---|---|---|---|---|---|
+| Business | 15 | 87% | 3.7 | 5.0 | 4.6 | 4.7 | 4.5 |
+| Labor | 8 | 100% | 3.2 | 5.0 | 4.2 | 4.6 | 4.3 |
+| GDP | 5 | 100% | 3.0 | 5.0 | 3.0 | 3.4 | 3.6 |
+| Overview | 1 | 100% | 5.0 | 5.0 | 5.0 | 5.0 | 5.0 |
+| Reference | 1 | — | — | — | — | — | — |
+| **Total** | **29** | **93%** | **3.4** | **5.0** | **4.1** | **4.4** | **4.3** |
+
+### Key Findings
+
+- **Tool selection is strong** (93%): the agent consistently picks the correct API endpoint.
+- **Language matching is perfect** (5.0): system prompt rewrite fully resolved the wrong-language issue.
+- **Factual accuracy is the main gap** (3.4): the LLM occasionally reports incorrect trend directions, contradictory numbers, or confuses aggregate totals with sector-level data. This is a Llama 3.3 synthesis limitation, not an architecture issue.
+- **GDP is the weakest category** (3.6 overall): the agent confuses the GDP total row with individual sectors and struggles with sector-level comparisons.
+- **Latency varies significantly**: p50 ranges from 2-7s, but p95 reaches 37-53s on complex queries due to Groq free tier rate limiting.
+
+### Running Evals
+
+```bash
+# All tests (requires multiple days on free tier)
+python3 -m evals.run_evals --delay 20
+
+# By category (recommended for free tier)
+python3 -m evals.run_evals --category business --delay 20
+
+# Without judge (faster, deterministic only)
+python3 -m evals.run_evals --category labor --no-judge
+
+# Dry run (preview test cases)
+python3 -m evals.run_evals --dry-run
+```
+
+Scores are pushed to Langfuse when `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY` are set, enabling trace-level quality monitoring in the Langfuse dashboard.
 
 ## Project Structure
 
