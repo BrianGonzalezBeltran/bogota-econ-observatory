@@ -296,7 +296,7 @@ def main():
         print(f"  p50: {p50}ms | p95: {p95}ms | max: {max(latencies)}ms")
 
     # ── Save results ─────────────────────────────────────────────────────
-    output_path = Path(__file__).parent / "results.json"
+    output_path = Path(__file__).parent / f"results_{time.strftime('%Y%m%d_%H%M%S')}.json"
     judge_averages = {}
     for key, values in judge_totals.items():
         if values:
